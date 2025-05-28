@@ -7,15 +7,11 @@ import { SidebarComponent } from './components/sidebar/sidebar.component';
   standalone: true,
   imports: [RouterModule, SidebarComponent],
   template: `
-    <!-- Анимированный фон -->
-    <div class="gradient-bg">
-      <div class="gradients-container">
-        <div class="g1"></div>
-        <div class="g2"></div>
-        <div class="g3"></div>
-        <div class="g4"></div>
-        <div class="g5"></div>
-      </div>
+    <!-- Видеофон -->
+    <div class="video-background">
+      <video autoplay loop muted playsinline class="video-bg">
+        <source src="../assets/video/fon_video.mov" type="video/quicktime">
+      </video>
     </div>
 
     <!-- Основной контент -->
