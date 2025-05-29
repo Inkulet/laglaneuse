@@ -1,94 +1,134 @@
 <div class="section-container">
   <h2 class="section-title">Экскурсионные программы</h2>
 
-  <div class="project-card">
-    <div class="project-header">
-      <h3 class="project-title">Анималистика. И в шутку, и всерьез.</h3>
-      <p class="project-subtitle">Авторская экскурсия (еженедельно)</p>
+  <!-- Контейнер для карточек с горизонтальной прокруткой -->
+  <div class="cards-container">
+    <!-- Индикаторы прокрутки -->
+    <div class="scroll-indicator">
+      <span class="dot active"></span>
+      <span class="dot"></span>
     </div>
 
-    <div class="project-content">
-      <div class="project-gallery">
-        <img src="/assets/excursion1.jpeg" alt="Экспонаты выставки" class="gallery-image">
-        <img src="/assets/excursion2.jpeg" alt="Рабочий процесс" class="gallery-image">
-        <img src="/assets/excursion3.jpeg" alt="Интерактив с посетителями" class="gallery-image">
-      </div>
-
-      <div class="project-description">
-        <p>Интерактивная экскурсия через призму современного искусства, где зрители становятся участниками художественного диалога. Маршрут построен на контрасте классической музейной архитектуры и экспериментальных арт-объектов.</p>
-
-        <div class="project-details">
-          <p><i class="material-icons">location_on</i> Адрес: Музей искусства Санкт-Петербурга XX–XXI веков (МИСП), наб. канала Грибоедова, 103</p>
-          <p><i class="material-icons">schedule</i> Время проведения: Каждую субботу в 15:00</p>
-          <p><i class="material-icons">group</i> Группа: до 15 человек</p>
+    <!-- Карточки экскурсий -->
+    <div class="cards-wrapper">
+      <!-- Карточка 1 -->
+      <div class="tour-card" (click)="expandCard($event, 0)">
+        <div class="card-image">
+          <img src="/assets/excursion1.jpeg" alt="Анималистика. И в шутку, и всерьез.">
+          <div class="card-badge">Еженедельно</div>
         </div>
-      </div>
 
-      <div class="location-container">
-        <div class="museum-photo">
-          <img src="/assets/misp-building.jpg" alt="Здание музея МИСП" class="location-image">
-        </div>
-        <div class="map-container">
-          <a href="https://yandex.ru/maps/2/saint-petersburg/?ll=30.300037%2C59.926478&z=16&mode=search&text=МИСП" target="_blank" class="map-link">
-            <img src="https://static-maps.yandex.ru/1.x/?ll=30.300037,59.926478&z=16&size=600,300&l=map&pt=30.300037,59.926478,pm2rdl"
-                 alt="Карта расположения"
-                 class="map-image">
-          </a>
-          <div class="map-annotation">
-            <i class="material-icons">subway</i> Ближайшее метро: Садовая (10 мин.)
+        <div class="card-content">
+          <h3 class="card-title">Анималистика. И в шутку, и всерьез.</h3>
+          <p class="card-subtitle">Авторская экскурсия</p>
+
+          <div class="card-actions">
+            <button class="action-button like" (click)="$event.stopPropagation()">
+              <i class="material-icons">favorite_border</i>
+            </button>
+            <button class="action-button details" (click)="expandCard($event, 0)">
+              Подробнее
+            </button>
+            <button class="action-button share" (click)="$event.stopPropagation()">
+              <i class="material-icons">share</i>
+            </button>
           </div>
         </div>
       </div>
 
-      <blockquote class="project-quote">
-        "Искусство живет в диалоге - между пространством и временем, художником и зрителем, прошлым и будущим"
-      </blockquote>
-    </div>
-  </div>
-
-  <div class="project-card" style="margin-top: 40px;">
-    <div class="project-header">
-      <h3 class="project-title">Бла бла бла</h3>
-      <p class="project-subtitle">Авторская экскурсия (еженедельно)</p>
-    </div>
-
-    <div class="project-content">
-      <div class="project-gallery">
-        <img src="/assets/excursion1.jpeg" alt="Экспонаты выставки" class="gallery-image">
-        <img src="/assets/excursion2.jpeg" alt="Рабочий процесс" class="gallery-image">
-        <img src="/assets/excursion3.jpeg" alt="Интерактив с посетителями" class="gallery-image">
-      </div>
-
-      <div class="project-description">
-        <p>Интерактивная экскурсия через призму современного искусства, где зрители становятся участниками художественного диалога. Маршрут построен на контрасте классической музейной архитектуры и экспериментальных арт-объектов.</p>
-
-        <div class="project-details">
-          <p><i class="material-icons">location_on</i> Адрес: Музей искусства Санкт-Петербурга XX–XXI веков (МИСП), наб. канала Грибоедова, 103</p>
-          <p><i class="material-icons">schedule</i> Время проведения: Каждую субботу в 15:00</p>
-          <p><i class="material-icons">group</i> Группа: до 15 человек</p>
+      <!-- Карточка 2 -->
+      <div class="tour-card" (click)="expandCard($event, 1)">
+        <div class="card-image">
+          <img src="/assets/excursion2.jpeg" alt="Бла бла бла">
+          <div class="card-badge">Еженедельно</div>
         </div>
-      </div>
 
-      <div class="location-container">
-        <div class="museum-photo">
-          <img src="/assets/misp-building.jpg" alt="Здание музея МИСП" class="location-image">
-        </div>
-        <div class="map-container">
-          <a href="https://yandex.ru/maps/2/saint-petersburg/?ll=30.300037%2C59.926478&z=16&mode=search&text=МИСП" target="_blank" class="map-link">
-            <img src="https://static-maps.yandex.ru/1.x/?ll=30.300037,59.926478&z=16&size=600,300&l=map&pt=30.300037,59.926478,pm2rdl"
-                 alt="Карта расположения"
-                 class="map-image">
-          </a>
-          <div class="map-annotation">
-            <i class="material-icons">subway</i> Ближайшее метро: Садовая (10 мин.)
+        <div class="card-content">
+          <h3 class="card-title">Бла бла бла</h3>
+          <p class="card-subtitle">Авторская экскурсия</p>
+
+          <div class="card-actions">
+            <button class="action-button like" (click)="$event.stopPropagation()">
+              <i class="material-icons">favorite_border</i>
+            </button>
+            <button class="action-button details" (click)="expandCard($event, 1)">
+              Подробнее
+            </button>
+            <button class="action-button share" (click)="$event.stopPropagation()">
+              <i class="material-icons">share</i>
+            </button>
           </div>
         </div>
       </div>
-
-      <blockquote class="project-quote">
-        "Искусство живет в диалоге - между пространством и временем, художником и зрителем, прошлым и будущим"
-      </blockquote>
     </div>
   </div>
-
 </div>
+
+<!-- Шаблон для развернутой карточки (будет клонироваться через JS) -->
+<ng-template #expandedCardTemplate>
+  <div class="tour-card expanded">
+    <div class="card-header">
+      <button class="close-button" (click)="closeExpandedCard()">
+        <i class="material-icons">arrow_back</i>
+      </button>
+      <h3 class="card-title">{{selectedTour?.title}}</h3>
+      <p class="card-subtitle">{{selectedTour?.subtitle}}</p>
+    </div>
+
+    <div class="card-gallery">
+      <div class="gallery-slider">
+        <img *ngFor="let image of selectedTour?.images"
+             [src]="image.src"
+             [alt]="image.alt"
+             class="gallery-image">
+      </div>
+      <div class="gallery-dots">
+        <span *ngFor="let image of selectedTour?.images; let i = index"
+              class="dot"
+              [class.active]="i === 0"></span>
+      </div>
+    </div>
+
+    <div class="card-description">
+      <p>{{selectedTour?.description}}</p>
+    </div>
+
+    <div class="card-details">
+      <div class="detail-item">
+        <i class="material-icons">location_on</i>
+        <p>{{selectedTour?.location}}</p>
+      </div>
+      <div class="detail-item">
+        <i class="material-icons">schedule</i>
+        <p>{{selectedTour?.schedule}}</p>
+      </div>
+      <div class="detail-item">
+        <i class="material-icons">group</i>
+        <p>{{selectedTour?.group}}</p>
+      </div>
+    </div>
+
+    <div class="location-container">
+      <div class="museum-photo">
+        <img [src]="selectedTour?.museumPhoto" alt="Здание музея" class="location-image">
+      </div>
+      <div class="map-container">
+        <a [href]="selectedTour?.mapLink" target="_blank" class="map-link">
+          <img [src]="selectedTour?.mapImage" alt="Карта расположения" class="map-image">
+        </a>
+        <div class="map-annotation">
+          <i class="material-icons">subway</i> {{selectedTour?.metro}}
+        </div>
+      </div>
+    </div>
+
+    <blockquote class="card-quote" *ngIf="selectedTour?.quote">
+      "{{selectedTour?.quote}}"
+    </blockquote>
+
+    <div class="card-actions expanded">
+      <button class="action-button primary">Записаться</button>
+      <button class="action-button secondary">Поделиться</button>
+    </div>
+  </div>
+</ng-template>
