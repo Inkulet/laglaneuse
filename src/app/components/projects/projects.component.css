@@ -205,6 +205,74 @@
   }
 }
 
+/* Кнопка лайка */
+.like-button {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.8);
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  z-index: 5;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  opacity: 0.7;
+}
+
+.like-button:hover {
+  transform: scale(1.1);
+  opacity: 1;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.like-button.liked {
+  background: rgba(255, 255, 255, 0.95);
+  opacity: 1;
+}
+
+.like-button.expanded {
+  position: absolute;
+  top: 1rem;
+  right: 4rem;
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.heart-icon {
+  display: inline-block;
+  width: 20px;
+  height: 20px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23798777' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z'%3E%3C/path%3E%3C/svg%3E");
+  background-size: contain;
+  background-repeat: no-repeat;
+  transition: transform 0.3s ease, background-image 0.3s ease;
+}
+
+.heart-icon.filled {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23798777' stroke='%23798777' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z'%3E%3C/path%3E%3C/svg%3E");
+  transform: scale(1.2);
+}
+
+.like-button:active .heart-icon {
+  transform: scale(1.3);
+}
+
+/* Анимация пульсации при лайке */
+@keyframes pulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.3); }
+  100% { transform: scale(1); }
+}
+
+.like-button.liked .heart-icon {
+  animation: pulse 0.3s ease-in-out;
+}
+
 .card-content {
   padding: 1.2rem;
 }
@@ -279,6 +347,7 @@
 .expanded-card-header {
   padding: 1rem;
   text-align: right;
+  position: relative;
 }
 
 .close-button {
@@ -446,6 +515,11 @@
   .project-quote {
     padding: 1.5rem;
     margin: 1.5rem 0;
+  }
+
+  .like-button {
+    width: 44px;
+    height: 44px;
   }
 }
 
