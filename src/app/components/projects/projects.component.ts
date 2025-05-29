@@ -19,6 +19,7 @@ interface Project {
   status: 'completed' | 'in-progress'; // Статус проекта
   details: string[];
   quote?: string;
+  liked?: boolean; // Новое поле для отслеживания лайков
 }
 
 @Component({
@@ -33,6 +34,10 @@ export class ProjectsComponent implements OnInit {
 
   selectedProject: Project | null = null;
   expandedCardElement: HTMLElement | null = null;
+
+  // Отсортированные массивы проектов
+  sortedCreatedProjects: Project[] = [];
+  sortedCuratedProjects: Project[] = [];
 
   // Проекты, созданные пользователем
   createdProjects: Project[] = [
@@ -56,7 +61,8 @@ export class ProjectsComponent implements OnInit {
         'Участники: 12 художников из 4 кафедр',
         'Авторский кураторский текст'
       ],
-      quote: 'И вечно жить нам, и вечно плыть нам. Объединяйтесь вместе, взаимодействуйте с другими кафедрами и плывите дальше, сохраняя самое ценное через искусство'
+      quote: 'И вечно жить нам, и вечно плыть нам. Объединяйтесь вместе, взаимодействуйте с другими кафедрами и плывите дальше, сохраняя самое ценное через искусство',
+      liked: false
     },
     {
       id: 1,
@@ -76,7 +82,8 @@ export class ProjectsComponent implements OnInit {
         'Место проведения: Галерея современного искусства',
         'Участники: 5 художников',
         'Планируемая дата открытия: декабрь 2025'
-      ]
+      ],
+      liked: false
     }
   ];
 
@@ -103,17 +110,121 @@ export class ProjectsComponent implements OnInit {
         'Продолжительность: 3 месяца',
         'Итоговая выставка: 2 недели'
       ],
-      quote: 'Искусство — это диалог между художником и пространством, между прошлым и будущим, между личным и общественным'
+      quote: 'Искусство — это диалог между художником и пространством, между прошлым и будущим, между личным и общественным',
+      liked: false
     }
   ];
 
   constructor(private renderer: Renderer2, private el: ElementRef) {}
 
   ngOnInit() {
+    // Загрузка лайков из localStorage
+    this.loadLikedProjects();
+
+    // Сортировка проектов (лайкнутые сверху)
+    this.sortProjects();
+
     // Инициализация обработчиков прокрутки для индикаторов
     setTimeout(() => {
       this.initScrollIndicators();
     }, 500);
+  }
+
+  // Загрузка лайкнутых проектов из localStorage
+  loadLikedProjects() {
+    try {
+      const preferences = localStorage.getItem('laglaneuse_user_preferences');
+      if (preferences) {
+        const data = JSON.parse(preferences);
+        if (data.likedItems && data.likedItems.projects) {
+          // Обновляем состояние лайков в массивах проектов
+          const likedIds = data.likedItems.projects;
+
+          this.createdProjects.forEach(project => {
+            project.liked = likedIds.includes(project.id);
+          });
+
+          this.curatedProjects.forEach(project => {
+            project.liked = likedIds.includes(project.id);
+          });
+        }
+      }
+    } catch (error) {
+      console.error('Ошибка при загрузке лайков из localStorage:', error);
+    }
+  }
+
+  // Сохранение лайкнутых проектов в localStorage
+  saveLikedProjects() {
+    try {
+      // Получаем текущие предпочтения пользователя
+      let preferences = {};
+      const savedPreferences = localStorage.getItem('laglaneuse_user_preferences');
+      if (savedPreferences) {
+        preferences = JSON.parse(savedPreferences);
+      }
+
+      // Собираем ID лайкнутых проектов из обоих массивов
+      const likedCreatedIds = this.createdProjects.filter(p => p.liked).map(p => p.id);
+      const likedCuratedIds = this.curatedProjects.filter(p => p.liked).map(p => p.id);
+      const allLikedIds = [...likedCreatedIds, ...likedCuratedIds];
+
+      // Обновляем данные
+      preferences = {
+        ...preferences,
+        likedItems: {
+          ...(preferences as any).likedItems,
+          projects: allLikedIds
+        },
+        lastVisit: new Date().toISOString()
+      };
+
+      // Сохраняем в localStorage
+      localStorage.setItem('laglaneuse_user_preferences', JSON.stringify(preferences));
+    } catch (error) {
+      console.error('Ошибка при сохранении лайков в localStorage:', error);
+    }
+  }
+
+  // Сортировка проектов (лайкнутые сверху)
+  sortProjects() {
+    // Сортируем созданные проекты
+    this.sortedCreatedProjects = [...this.createdProjects];
+    this.sortedCreatedProjects.sort((a, b) => {
+      if (a.liked && !b.liked) return -1;
+      if (!a.liked && b.liked) return 1;
+      return 0;
+    });
+
+    // Сортируем курируемые проекты
+    this.sortedCuratedProjects = [...this.curatedProjects];
+    this.sortedCuratedProjects.sort((a, b) => {
+      if (a.liked && !b.liked) return -1;
+      if (!a.liked && b.liked) return 1;
+      return 0;
+    });
+  }
+
+  // Обработка клика по кнопке лайка
+  toggleLike(event: Event, projectId: number) {
+    event.stopPropagation(); // Предотвращаем открытие карточки
+
+    // Находим проект по ID в обоих массивах
+    let project = this.createdProjects.find(p => p.id === projectId);
+    if (!project) {
+      project = this.curatedProjects.find(p => p.id === projectId);
+    }
+
+    if (project) {
+      // Инвертируем состояние лайка
+      project.liked = !project.liked;
+
+      // Сохраняем изменения в localStorage
+      this.saveLikedProjects();
+
+      // Пересортировываем проекты
+      this.sortProjects();
+    }
   }
 
   initScrollIndicators() {
@@ -247,5 +358,33 @@ export class ProjectsComponent implements OnInit {
         behavior: 'smooth'
       });
     }
+  }
+
+  // Обработка лайка в развернутой карточке
+  toggleLikeInExpandedCard(event: Event) {
+    if (!this.selectedProject) return;
+
+    event.stopPropagation();
+
+    // Инвертируем состояние лайка
+    this.selectedProject.liked = !this.selectedProject.liked;
+
+    // Обновляем состояние в основных массивах
+    let project: Project | undefined;
+    if (this.selectedProject.type === 'created') {
+      project = this.createdProjects.find(p => p.id === this.selectedProject?.id);
+    } else {
+      project = this.curatedProjects.find(p => p.id === this.selectedProject?.id);
+    }
+
+    if (project) {
+      project.liked = this.selectedProject.liked;
+    }
+
+    // Сохраняем изменения в localStorage
+    this.saveLikedProjects();
+
+    // Пересортировываем проекты
+    this.sortProjects();
   }
 }

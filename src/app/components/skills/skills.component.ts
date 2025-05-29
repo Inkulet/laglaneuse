@@ -21,6 +21,7 @@ interface Tour {
   mapLink: string;
   metro: string;
   quote?: string;
+  liked?: boolean; // Новое поле для отслеживания лайков
 }
 
 @Component({
@@ -36,6 +37,10 @@ export class SkillsComponent implements OnInit {
   selectedTour: Tour | null = null;
   expandedCardElement: HTMLElement | null = null;
 
+  // Массив для хранения отсортированных экскурсий
+  sortedTours: Tour[] = [];
+
+  // Исходные данные экскурсий
   tours: Tour[] = [
     {
       id: 0,
@@ -55,7 +60,8 @@ export class SkillsComponent implements OnInit {
       mapImage: 'https://static-maps.yandex.ru/1.x/?ll=30.300037,59.926478&z=16&size=600,300&l=map&pt=30.300037,59.926478,pm2rdl',
       mapLink: 'https://yandex.ru/maps/2/saint-petersburg/?ll=30.300037%2C59.926478&z=16&mode=search&text=МИСП',
       metro: 'Ближайшее метро: Садовая (10 мин.)',
-      quote: 'Искусство живет в диалоге - между пространством и временем, художником и зрителем, прошлым и будущим'
+      quote: 'Искусство живет в диалоге - между пространством и временем, художником и зрителем, прошлым и будущим',
+      liked: false
     },
     {
       id: 1,
@@ -75,17 +81,103 @@ export class SkillsComponent implements OnInit {
       mapImage: 'https://static-maps.yandex.ru/1.x/?ll=30.300037,59.926478&z=16&size=600,300&l=map&pt=30.300037,59.926478,pm2rdl',
       mapLink: 'https://yandex.ru/maps/2/saint-petersburg/?ll=30.300037%2C59.926478&z=16&mode=search&text=МИСП',
       metro: 'Ближайшее метро: Садовая (10 мин.)',
-      quote: 'Искусство живет в диалоге - между пространством и временем, художником и зрителем, прошлым и будущим'
+      quote: 'Искусство живет в диалоге - между пространством и временем, художником и зрителем, прошлым и будущим',
+      liked: false
     }
   ];
 
   constructor(private renderer: Renderer2, private el: ElementRef) {}
 
   ngOnInit() {
+    // Загрузка лайков из localStorage
+    this.loadLikedTours();
+
+    // Сортировка экскурсий (лайкнутые сверху)
+    this.sortTours();
+
     // Инициализация обработчика прокрутки для индикаторов
     setTimeout(() => {
       this.initScrollIndicators();
     }, 500);
+  }
+
+  // Загрузка лайкнутых экскурсий из localStorage
+  loadLikedTours() {
+    try {
+      const preferences = localStorage.getItem('laglaneuse_user_preferences');
+      if (preferences) {
+        const data = JSON.parse(preferences);
+        if (data.likedItems && data.likedItems.skills) {
+          // Обновляем состояние лайков в массиве экскурсий
+          this.tours.forEach(tour => {
+            tour.liked = data.likedItems.skills.includes(tour.id);
+          });
+        }
+      }
+    } catch (error) {
+      console.error('Ошибка при загрузке лайков из localStorage:', error);
+    }
+  }
+
+  // Сохранение лайкнутых экскурсий в localStorage
+  saveLikedTours() {
+    try {
+      // Получаем текущие предпочтения пользователя
+      let preferences = {};
+      const savedPreferences = localStorage.getItem('laglaneuse_user_preferences');
+      if (savedPreferences) {
+        preferences = JSON.parse(savedPreferences);
+      }
+
+      // Собираем ID лайкнутых экскурсий
+      const likedTourIds = this.tours.filter(tour => tour.liked).map(tour => tour.id);
+
+      // Обновляем данные
+      preferences = {
+        ...preferences,
+        likedItems: {
+          ...(preferences as any).likedItems,
+          skills: likedTourIds
+        },
+        lastVisit: new Date().toISOString()
+      };
+
+      // Сохраняем в localStorage
+      localStorage.setItem('laglaneuse_user_preferences', JSON.stringify(preferences));
+    } catch (error) {
+      console.error('Ошибка при сохранении лайков в localStorage:', error);
+    }
+  }
+
+  // Сортировка экскурсий (лайкнутые сверху)
+  sortTours() {
+    // Создаем копию массива для сортировки
+    this.sortedTours = [...this.tours];
+
+    // Сортируем: сначала лайкнутые, затем остальные в исходном порядке
+    this.sortedTours.sort((a, b) => {
+      if (a.liked && !b.liked) return -1;
+      if (!a.liked && b.liked) return 1;
+      return 0;
+    });
+  }
+
+  // Обработка клика по кнопке лайка
+  toggleLike(event: Event, tourId: number) {
+    event.stopPropagation(); // Предотвращаем открытие карточки
+
+    // Находим экскурсию по ID
+    const tour = this.tours.find(t => t.id === tourId);
+    if (tour) {
+      // Инвертируем состояние лайка
+      tour.liked = !tour.liked;
+
+      // Сохраняем изменения в localStorage
+      this.saveLikedTours();
+
+      // Пересортировываем экскурсии
+      this.sortTours();
+    }
   }
 
   initScrollIndicators() {
@@ -109,11 +201,11 @@ export class SkillsComponent implements OnInit {
     }
   }
 
-  expandCard(event: Event, tourIndex: number) {
+  expandCard(event: Event, tour: Tour) {
     event.stopPropagation();
 
     // Устанавливаем выбранную экскурсию
-    this.selectedTour = this.tours[tourIndex];
+    this.selectedTour = tour;
 
     // Создаем элемент из шаблона
     const viewContainerRef = this.el.nativeElement;
@@ -180,5 +272,27 @@ export class SkillsComponent implements OnInit {
         });
       });
     }
+  }
+
+  // Обработка лайка в развернутой карточке
+  toggleLikeInExpandedCard(event: Event) {
+    if (!this.selectedTour) return;
+
+    event.stopPropagation();
+
+    // Инвертируем состояние лайка
+    this.selectedTour.liked = !this.selectedTour.liked;
+
+    // Обновляем состояние в основном массиве
+    const tour = this.tours.find(t => t.id === this.selectedTour?.id);
+    if (tour) {
+      tour.liked = this.selectedTour.liked;
+    }
+
+    // Сохраняем изменения в localStorage
+    this.saveLikedTours();
+
+    // Пересортировываем экскурсии
+    this.sortTours();
   }
 }

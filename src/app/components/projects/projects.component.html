@@ -11,7 +11,7 @@
         </button>
         <div class="scroll-indicator created-projects-indicator">
           <span class="dot active"></span>
-          <span class="dot" *ngFor="let _ of createdProjects.slice(1)"></span>
+          <span class="dot" *ngFor="let _ of sortedCreatedProjects.slice(1)"></span>
         </div>
         <button class="nav-button next" (click)="scrollCategory('right', 'created-projects-wrapper')">
           <i class="arrow right"></i>
@@ -20,11 +20,16 @@
     </div>
 
     <div class="cards-wrapper" id="created-projects-wrapper">
-      <div class="project-card created" *ngFor="let project of createdProjects" (click)="expandCard($event, project)">
+      <div class="project-card created" *ngFor="let project of sortedCreatedProjects" (click)="expandCard($event, project)">
         <div class="card-image-container">
           <img [src]="project.images[0].src" [alt]="project.images[0].alt" class="card-image">
           <div class="card-badge creator">Создатель</div>
           <div class="status-indicator" [ngClass]="project.status === 'completed' ? 'completed' : 'in-progress'"></div>
+
+          <!-- Кнопка лайка -->
+          <button class="like-button" [class.liked]="project.liked" (click)="toggleLike($event, project.id)">
+            <i class="heart-icon" [class.filled]="project.liked"></i>
+          </button>
         </div>
         <div class="card-content">
           <h4 class="card-title">{{ project.title }}</h4>
@@ -44,7 +49,7 @@
         </button>
         <div class="scroll-indicator curated-projects-indicator">
           <span class="dot active"></span>
-          <span class="dot" *ngFor="let _ of curatedProjects.slice(1)"></span>
+          <span class="dot" *ngFor="let _ of sortedCuratedProjects.slice(1)"></span>
         </div>
         <button class="nav-button next" (click)="scrollCategory('right', 'curated-projects-wrapper')">
           <i class="arrow right"></i>
@@ -53,11 +58,16 @@
     </div>
 
     <div class="cards-wrapper" id="curated-projects-wrapper">
-      <div class="project-card curated" *ngFor="let project of curatedProjects" (click)="expandCard($event, project)">
+      <div class="project-card curated" *ngFor="let project of sortedCuratedProjects" (click)="expandCard($event, project)">
         <div class="card-image-container">
           <img [src]="project.images[0].src" [alt]="project.images[0].alt" class="card-image">
           <div class="card-badge curator">Куратор</div>
           <div class="status-indicator" [ngClass]="project.status === 'completed' ? 'completed' : 'in-progress'"></div>
+
+          <!-- Кнопка лайка -->
+          <button class="like-button" [class.liked]="project.liked" (click)="toggleLike($event, project.id)">
+            <i class="heart-icon" [class.filled]="project.liked"></i>
+          </button>
         </div>
         <div class="card-content">
           <h4 class="card-title">{{ project.title }}</h4>
@@ -74,6 +84,11 @@
     <div class="expanded-card" [ngClass]="project.type === 'created' ? 'created' : 'curated'" (click)="$event.stopPropagation()">
       <div class="expanded-card-header">
         <button class="close-button" (click)="closeExpandedCard()">×</button>
+
+        <!-- Кнопка лайка в развернутой карточке -->
+        <button class="like-button expanded" [class.liked]="project.liked" (click)="toggleLikeInExpandedCard($event)">
+          <i class="heart-icon" [class.filled]="project.liked"></i>
+        </button>
       </div>
 
       <div class="gallery-container">
